@@ -1,0 +1,15 @@
+* { box-sizing: border-box; }
+html, body { margin: 0; background: #04050c; }
+#root { min-height: 100vh; }
+a { text-decoration: none; color: inherit; }
+button { font: inherit; }
+
+@keyframes twinkle { 0%, 100% { opacity: .25; } 50% { opacity: .9; } }
+@keyframes driftSlow { 0%, 100% { transform: translate(0,0); } 50% { transform: translate(-10px,8px); } }
+@keyframes drift { 0%, 100% { transform: translate(-50%,-50%) translate(0,0); } 50% { transform: translate(-50%,-50%) translate(-8px,8px); } }
+@keyframes floatY { 0%, 100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(-16px); } }
+@keyframes rise { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes spinSlow { to { transform: rotate(360deg); } }
+@keyframes spinRev { to { transform: rotate(-360deg); } }
+
+.glx-label { position: absolute; transform: translate(-50%,-140%); text-align: center; pointer-events: none; white-space: nowrap; transition: opacity .2s; }
