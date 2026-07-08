@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { GALAXIES, PLANETS, diffStars } from "../data.js";
+import { GALAXIES, PLANETS, diffStars, withAlpha } from "../data.js";
 import PageTopBar, { ExplorerBadge } from "../components/PageTopBar.jsx";
+import { setGlowColor, resetGlowColor } from "../components/CursorGlow.jsx";
 import { useIdentity } from "../hooks/useIdentity.js";
 
 const ink = "#e7e8ea";
@@ -136,7 +137,12 @@ export default function Explore() {
         cam.x = panning.cx - (sx - panning.sx) / cam.scale;
         cam.y = panning.cy - (sy - panning.sy) / cam.scale;
       } else {
-        hover = pick(sx, sy);
+        const next = pick(sx, sy);
+        if (next !== hover) {
+          hover = next;
+          if (hover) setGlowColor(withAlpha(hover.color, 0.24));
+          else resetGlowColor();
+        }
       }
     }
     function onMouseUp() {
@@ -189,13 +195,14 @@ export default function Explore() {
         c.beginPath(); c.arc(p.x, p.y, r, 0, Math.PI * 2);
         if (n.kind === "galaxy") {
           const g = c.createRadialGradient(p.x - r * 0.3, p.y - r * 0.3, r * 0.2, p.x, p.y, r);
-          g.addColorStop(0, "#f2f3f5"); g.addColorStop(0.45, "#9199a3"); g.addColorStop(1, "#43474e");
+          g.addColorStop(0, "#f5f3fa"); g.addColorStop(0.5, n.color); g.addColorStop(1, "#3a3d42");
           c.fillStyle = g;
         } else {
-          c.fillStyle = lit ? "#c7cbd1" : "#6d7580";
+          c.fillStyle = lit ? n.color : "#6d7580";
         }
         c.fill();
         if (n.kind === "galaxy") { c.strokeStyle = "rgba(235,236,239,.45)"; c.lineWidth = 1; c.stroke(); }
+        else if (lit) { c.strokeStyle = withAlpha(n.color, 0.8); c.lineWidth = 1.4; c.stroke(); }
         if (cam.scale > 0.6 || n.kind === "galaxy") {
           c.globalAlpha = dim ? 0.28 : 1;
           c.fillStyle = n.kind === "galaxy" ? ink : inkDim;
@@ -260,7 +267,7 @@ export default function Explore() {
   const galaxyRows = GALAXIES.map((g) => {
     const on = !off[g.id];
     return {
-      id: g.id, name: g.name, count: PLANET_COUNTS[g.id] || 0,
+      id: g.id, name: g.name, color: g.color, count: PLANET_COUNTS[g.id] || 0,
       style: {
         ...rowBase,
         ...(on
@@ -306,8 +313,14 @@ export default function Explore() {
           <div style={{ fontFamily: "'Space Mono',monospace", fontSize: 11, color: inkFaint, letterSpacing: ".14em", marginBottom: 10, textTransform: "uppercase" }}>星系 GALAXIES</div>
           <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 24 }}>
             {galaxyRows.map((g) => (
-              <button key={g.id} onClick={() => toggleGalaxy(g.id)} style={g.style}>
-                <span style={{ width: 10, height: 10, border: `1px solid ${lineStrong}`, flex: "none" }} />
+              <button
+                key={g.id}
+                onClick={() => toggleGalaxy(g.id)}
+                onMouseEnter={() => setGlowColor(withAlpha(g.color, 0.22))}
+                onMouseLeave={resetGlowColor}
+                style={g.style}
+              >
+                <span style={{ width: 10, height: 10, borderRadius: "50%", background: g.color, flex: "none" }} />
                 <span style={{ flex: 1, textAlign: "left", fontSize: 13 }}>{g.name}</span>
                 <span style={{ fontFamily: "'Space Mono',monospace", fontSize: 11, color: inkFaint }}>{g.count}</span>
               </button>
@@ -332,9 +345,9 @@ export default function Explore() {
           <canvas ref={canvasRef} style={{ display: "block", cursor: "grab" }} />
           <div style={{ position: "absolute", top: 16, left: 16, fontFamily: "'Space Mono',monospace", fontSize: 11, color: inkFaint, pointerEvents: "none" }}>NODES: {visibleCount} · GRAPH VIEW</div>
           <div style={{ position: "absolute", bottom: 16, left: 16, display: "flex", gap: 16, fontFamily: "'Space Mono',monospace", fontSize: 11, color: inkDim, pointerEvents: "none" }}>
-            <span><span style={{ color: inkFaint }}>●</span> 寫作</span>
-            <span><span style={{ color: inkFaint }}>●</span> 程式</span>
-            <span><span style={{ color: inkFaint }}>●</span> 行銷</span>
+            {GALAXIES.map((g) => (
+              <span key={g.id}><span style={{ color: g.color }}>●</span> {g.name.replace("星系", "")}</span>
+            ))}
           </div>
         </div>
 
@@ -343,9 +356,9 @@ export default function Explore() {
           {sel ? (
             <div>
               <div style={{ fontFamily: "'Space Mono',monospace", fontSize: 11, color: inkFaint, letterSpacing: ".14em", marginBottom: 14, textTransform: "uppercase" }}>{sel.coord} · {sel.type.toUpperCase()}</div>
-              <div style={{ width: 60, height: 60, border: `1px solid ${lineStrong}`, background: "radial-gradient(circle at 34% 30%, #cfd2d7, #6d7580 60%)", marginBottom: 16 }} />
+              <div style={{ width: 60, height: 60, border: `1px solid ${lineStrong}`, background: `radial-gradient(circle at 34% 30%, #f5f3fa, ${GALAXIES.find((g) => g.id === sel.galaxy).color} 60%)`, marginBottom: 16 }} />
               <h2 style={{ fontFamily: "'Chakra Petch',sans-serif", color: ink, fontSize: 20, margin: "0 0 2px" }}>{sel.name}</h2>
-              <div style={{ fontFamily: "'Space Mono',monospace", fontSize: 11, color: steel, letterSpacing: ".08em", marginBottom: 16 }}>{sel.en}</div>
+              <div style={{ fontFamily: "'Space Mono',monospace", fontSize: 11, color: GALAXIES.find((g) => g.id === sel.galaxy).color, letterSpacing: ".08em", marginBottom: 16 }}>{sel.en}</div>
               <p style={{ color: inkDim, fontSize: 13.5, lineHeight: 1.8, margin: "0 0 18px" }}>{sel.summary}</p>
               <div style={{ display: "flex", gap: 1, marginBottom: 8, background: line }}>
                 <div style={{ flex: 1, padding: 10, background: "#08090a" }}>

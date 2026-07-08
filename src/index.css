@@ -14,6 +14,29 @@ button { font: inherit; }
 
 .glx-label { position: absolute; transform: translate(-50%,-140%); text-align: center; pointer-events: none; white-space: nowrap; transition: opacity .2s; }
 
+@property --glow-color {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: rgba(156,173,189,.16);
+}
+
+.cursor-glow {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 80;
+  opacity: 0;
+  --glow-x: 50%;
+  --glow-y: 50%;
+  --glow-color: rgba(156,173,189,.16);
+  background: radial-gradient(380px circle at var(--glow-x) var(--glow-y), var(--glow-color), transparent 72%);
+  mix-blend-mode: screen;
+  transition: opacity .35s ease, --glow-color .4s ease;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cursor-glow { display: none; }
+}
+
 /* --- cinematic brand-page textures (Home only) --- */
 @keyframes grainShift {
   0%, 100% { transform: translate(0,0); }

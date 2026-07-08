@@ -2,7 +2,8 @@ import { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-import { GALAXIES, PLANETS } from "../data.js";
+import { GALAXIES, PLANETS, withAlpha } from "../data.js";
+import { setGlowColor, resetGlowColor } from "../components/CursorGlow.jsx";
 
 const ink = "#e7e8ea";
 const inkDim = "#8f929a";
@@ -126,14 +127,14 @@ export default function Galaxy3D() {
       const sp2 = new THREE.Sprite(smat2);
       sp2.position.set(x, y, z); sp2.scale.set(16, 16, 1); scene.add(sp2);
 
-      const ring = new THREE.Mesh(new THREE.RingGeometry(30, 31.5, 64), new THREE.MeshBasicMaterial({ color: 0xd6dee4, side: THREE.DoubleSide, transparent: true, opacity: 0.35 }));
+      const ring = new THREE.Mesh(new THREE.RingGeometry(30, 31.5, 64), new THREE.MeshBasicMaterial({ color: g.color, side: THREE.DoubleSide, transparent: true, opacity: 0.4 }));
       ring.rotation.x = Math.PI / 2; ring.position.set(x, y, z); scene.add(ring);
 
       const el = document.createElement("div");
       el.className = "glx-label";
       el.innerHTML =
         `<div style="font-family:'Chakra Petch',sans-serif;color:#e7e8ea;font-size:15px;letter-spacing:.06em;">${g.name}</div>` +
-        `<div style="font-family:'Space Mono',monospace;font-size:10px;color:#9cadbd;letter-spacing:.12em;">${g.en} · ${PLANET_COUNTS[g.id] || 0}</div>`;
+        `<div style="font-family:'Space Mono',monospace;font-size:10px;color:${g.color};letter-spacing:.12em;">${g.en} · ${PLANET_COUNTS[g.id] || 0}</div>`;
       labelBox.appendChild(el);
       markers.push({ pos: new THREE.Vector3(x, y, z), el });
     });
@@ -210,10 +211,17 @@ export default function Galaxy3D() {
       </div>
 
       {/* legend */}
-      <div style={{ position: "absolute", bottom: 34, right: 36, display: "flex", flexDirection: "column", gap: 10, fontFamily: "'Chakra Petch',sans-serif", fontSize: 13, pointerEvents: "none" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10, color: inkDim, justifyContent: "flex-end" }}>寫作星系 <span style={{ width: 10, height: 10, border: `1px solid ${lineStrong}` }} /></div>
-        <div style={{ display: "flex", alignItems: "center", gap: 10, color: inkDim, justifyContent: "flex-end" }}>程式星系 <span style={{ width: 10, height: 10, border: `1px solid ${lineStrong}` }} /></div>
-        <div style={{ display: "flex", alignItems: "center", gap: 10, color: inkDim, justifyContent: "flex-end" }}>行銷星系 <span style={{ width: 10, height: 10, border: `1px solid ${lineStrong}` }} /></div>
+      <div style={{ position: "absolute", bottom: 34, right: 36, display: "flex", flexDirection: "column", gap: 10, fontFamily: "'Chakra Petch',sans-serif", fontSize: 13 }}>
+        {GALAXIES.map((g) => (
+          <div
+            key={g.id}
+            onMouseEnter={() => setGlowColor(withAlpha(g.color, 0.24))}
+            onMouseLeave={resetGlowColor}
+            style={{ display: "flex", alignItems: "center", gap: 10, color: inkDim, justifyContent: "flex-end" }}
+          >
+            {g.name} <span style={{ width: 10, height: 10, borderRadius: "50%", background: g.color }} />
+          </div>
+        ))}
       </div>
     </div>
   );

@@ -2,9 +2,9 @@
 // 每個星系 = 一種類別；每顆行星 = 一個 skill 或 prompt
 
 export const GALAXIES = [
-  { id: "words", name: "寫作星系", en: "NEBULA OF WORDS", color: "#8b96a3", desc: "文案、敘事、潤稿類 prompt 的家園" },
-  { id: "code", name: "程式星系", en: "CODE CLUSTER", color: "#aab4bf", desc: "除錯、重構、架構設計的技能航線" },
-  { id: "market", name: "行銷星系", en: "MARKET CONSTELLATION", color: "#6d7680", desc: "品牌、社群、成長策略的行星群" },
+  { id: "words", name: "寫作星系", en: "NEBULA OF WORDS", color: "#b6a8d6", desc: "文案、敘事、潤稿類 prompt 的家園" },
+  { id: "code", name: "程式星系", en: "CODE CLUSTER", color: "#93c3d8", desc: "除錯、重構、架構設計的技能航線" },
+  { id: "market", name: "行銷星系", en: "MARKET CONSTELLATION", color: "#d8bd8f", desc: "品牌、社群、成長策略的行星群" },
 ];
 
 export const PLANETS = [
@@ -37,4 +37,9 @@ export function galaxyById(id) {
 }
 export function diffStars(n) {
   return "★".repeat(n) + "☆".repeat(5 - n);
+}
+export function withAlpha(hex, alpha) {
+  const h = hex.replace("#", "");
+  const r = parseInt(h.slice(0, 2), 16), g = parseInt(h.slice(2, 4), 16), b = parseInt(h.slice(4, 6), 16);
+  return `rgba(${r},${g},${b},${alpha})`;
 }

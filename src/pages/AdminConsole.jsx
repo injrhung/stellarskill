@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { GALAXIES, PLANETS } from "../data.js";
+import { GALAXIES, PLANETS, withAlpha } from "../data.js";
+import { setGlowColor, resetGlowColor } from "../components/CursorGlow.jsx";
 
 const uid = () => "x" + Math.random().toString(36).slice(2, 8);
 
@@ -115,9 +116,14 @@ export default function AdminConsole() {
           {isGal ? (
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(300px,1fr))", gap: 1, background: line }}>
               {galaxies.map((g) => (
-                <div key={g.id} style={{ padding: 20, background: "#08090a" }}>
+                <div
+                  key={g.id}
+                  onMouseEnter={() => setGlowColor(withAlpha(g.color, 0.22))}
+                  onMouseLeave={resetGlowColor}
+                  style={{ padding: 20, background: "#08090a" }}
+                >
                   <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
-                    <span style={{ width: 28, height: 28, border: `1px solid ${lineStrong}`, flex: "none" }} />
+                    <span style={{ width: 28, height: 28, border: `1px solid ${lineStrong}`, background: withAlpha(g.color, 0.28), flex: "none" }} />
                     <div style={{ flex: 1 }}>
                       <div style={{ fontFamily: "'Chakra Petch',sans-serif", color: ink, fontSize: 16 }}>{g.name}</div>
                       <div style={{ fontFamily: "'Space Mono',monospace", fontSize: 10, color: inkFaint }}>{g.en}</div>
@@ -154,7 +160,7 @@ export default function AdminConsole() {
                   return (
                     <div key={p.id} style={{ display: "grid", gridTemplateColumns: "2fr 1.3fr 0.8fr 0.7fr 0.9fr 110px", alignItems: "center", padding: "13px 18px", borderTop: `1px solid ${line}` }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                        <span style={{ width: 14, height: 14, border: `1px solid ${lineStrong}`, flex: "none" }} />
+                        <span style={{ width: 14, height: 14, border: `1px solid ${lineStrong}`, background: withAlpha(g.color, 0.3), flex: "none" }} />
                         <div>
                           <div style={{ color: ink, fontSize: 14 }}>{p.name}</div>
                           <div style={{ fontFamily: "'Space Mono',monospace", fontSize: 10, color: inkFaint }}>{p.en}</div>
@@ -163,7 +169,7 @@ export default function AdminConsole() {
                       <span style={{ color: inkDim, fontSize: 13 }}>{g.name}</span>
                       <span style={{ fontFamily: "'Space Mono',monospace", fontSize: 11, color: inkDim, textTransform: "uppercase" }}>{p.type}</span>
                       <span style={{ fontFamily: "'Space Mono',monospace", fontSize: 12, color: inkDim }}>{p.coord}</span>
-                      <span style={{ color: steel, fontSize: 12 }}>{"★".repeat(p.difficulty)}</span>
+                      <span style={{ color: g.color, fontSize: 12 }}>{"★".repeat(p.difficulty)}</span>
                       <div style={{ display: "flex", gap: 6, justifyContent: "flex-end" }}>
                         <button onClick={() => openPlanetForm(p)} style={{ width: 32, height: 32, border: `1px solid ${line}`, background: "transparent", color: inkDim, borderRadius: 2, cursor: "pointer" }}>✎</button>
                         <button onClick={() => delPlanet(p.id)} style={{ width: 32, height: 32, border: `1px solid ${danger}55`, background: "transparent", color: danger, borderRadius: 2, cursor: "pointer" }}>✕</button>
@@ -209,7 +215,7 @@ export default function AdminConsole() {
                       <button
                         key={g.id}
                         onClick={() => set("galaxy", g.id)}
-                        style={{ height: 34, padding: "0 14px", borderRadius: 2, cursor: "pointer", fontSize: 12, fontFamily: "'Noto Sans TC',sans-serif", ...(fd.galaxy === g.id ? { border: `1px solid ${lineStrong}`, background: "rgba(255,255,255,.06)", color: ink } : { border: `1px solid ${line}`, background: "transparent", color: inkDim }) }}
+                        style={{ height: 34, padding: "0 14px", borderRadius: 2, cursor: "pointer", fontSize: 12, fontFamily: "'Noto Sans TC',sans-serif", ...(fd.galaxy === g.id ? { border: `1px solid ${g.color}`, background: withAlpha(g.color, 0.14), color: ink } : { border: `1px solid ${line}`, background: "transparent", color: inkDim }) }}
                       >
                         {g.name}
                       </button>

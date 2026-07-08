@@ -4,6 +4,8 @@ import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
 import Starfield from "../components/Starfield.jsx";
 import CornerBrackets from "../components/CornerBrackets.jsx";
+import { setGlowColor, resetGlowColor } from "../components/CursorGlow.jsx";
+import { GALAXIES, withAlpha } from "../data.js";
 
 gsap.registerPlugin(useGSAP);
 
@@ -28,9 +30,12 @@ const monoLabel = {
   letterSpacing: ".2em",
 };
 
+const galaxyColor = (id) => GALAXIES.find((g) => g.id === id).color;
+
 const archive = [
   {
     galaxy: "words",
+    color: galaxyColor("words"),
     index: "01",
     name: "寫作星系",
     designation: "NEBULA OF WORDS",
@@ -45,6 +50,7 @@ const archive = [
   },
   {
     galaxy: "code",
+    color: galaxyColor("code"),
     index: "02",
     name: "程式星系",
     designation: "CODE CLUSTER",
@@ -59,6 +65,7 @@ const archive = [
   },
   {
     galaxy: "market",
+    color: galaxyColor("market"),
     index: "03",
     name: "行銷星系",
     designation: "MARKET CONSTELLATION",
@@ -297,6 +304,8 @@ export default function Home() {
               key={c.galaxy}
               to={`/explore?g=${c.galaxy}`}
               className="archive-entry"
+              onMouseEnter={() => setGlowColor(withAlpha(c.color, 0.22))}
+              onMouseLeave={resetGlowColor}
               style={{
                 display: "block",
                 background: "#08090a",
@@ -305,8 +314,11 @@ export default function Home() {
               }}
             >
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                <span style={{ fontFamily: "'Space Mono',monospace", fontSize: 13, color: inkFaint }}>{c.index}</span>
-                <span style={{ color: inkFaint }}>{c.icon}</span>
+                <span style={{ display: "flex", alignItems: "center", gap: 9 }}>
+                  <span style={{ width: 6, height: 6, borderRadius: "50%", background: c.color }} />
+                  <span style={{ fontFamily: "'Space Mono',monospace", fontSize: 13, color: inkFaint }}>{c.index}</span>
+                </span>
+                <span style={{ color: c.color, opacity: 0.85 }}>{c.icon}</span>
               </div>
               <div style={{ marginTop: 22 }}>
                 <div style={{ color: ink, fontSize: 18, fontWeight: 500 }}>{c.name}</div>
@@ -314,7 +326,7 @@ export default function Home() {
               </div>
               <p style={{ color: inkDim, fontSize: 13.5, lineHeight: 1.85, margin: "16px 0 0", fontWeight: 300 }}>{c.desc}</p>
               <div style={{ ...monoLabel, fontSize: 10.5, color: inkFaint, marginTop: 22, display: "flex", alignItems: "center", gap: 8 }}>
-                {c.tag} <span style={{ color: steel }}>→</span>
+                {c.tag} <span style={{ color: c.color }}>→</span>
               </div>
             </Link>
           ))}
