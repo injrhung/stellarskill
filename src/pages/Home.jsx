@@ -1,98 +1,341 @@
+import { useRef } from "react";
 import { Link } from "react-router-dom";
+import { gsap } from "gsap";
+import { useGSAP } from "@gsap/react";
 import Starfield from "../components/Starfield.jsx";
+import CornerBrackets from "../components/CornerBrackets.jsx";
 
-const navLinkStyle = { color: "#8fa0c8" };
+gsap.registerPlugin(useGSAP);
 
-const missionCards = [
+const ink = "#e7e8ea";
+const inkDim = "#8f929a";
+const inkFaint = "#54575e";
+const line = "rgba(235,236,239,.10)";
+const lineStrong = "rgba(235,236,239,.24)";
+const steel = "#9cadbd";
+
+const navLinkStyle = {
+  color: inkDim,
+  textTransform: "uppercase",
+  letterSpacing: ".16em",
+  fontSize: 11.5,
+  fontFamily: "'Space Mono',monospace",
+};
+
+const monoLabel = {
+  fontFamily: "'Space Mono',monospace",
+  textTransform: "uppercase",
+  letterSpacing: ".2em",
+};
+
+const archive = [
   {
     galaxy: "words",
+    index: "01",
     name: "寫作星系",
-    color: "#c9b8ff",
-    border: "rgba(169,139,255,.32)",
-    dotBg: "radial-gradient(circle at 34% 30%,#d8c6ff,#a98bff 60%)",
-    glow: "rgba(169,139,255,.5)",
+    designation: "NEBULA OF WORDS",
     desc: "文案、敘事、潤稿類 prompt 的家園。",
-    tag: "NEBULA OF WORDS · 5 PLANETS →",
+    tag: "5 ENTRIES CATALOGUED",
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.1">
+        <path d="M4 20l3.2-.6L19 7.6a1.5 1.5 0 0 0 0-2.1l-.5-.5a1.5 1.5 0 0 0-2.1 0L4.6 16.8 4 20z" />
+        <path d="M14.5 6.5l3 3" />
+      </svg>
+    ),
   },
   {
     galaxy: "code",
+    index: "02",
     name: "程式星系",
-    color: "#9fe0ff",
-    border: "rgba(95,211,255,.32)",
-    dotBg: "radial-gradient(circle at 34% 30%,#bfefff,#5fd3ff 60%)",
-    glow: "rgba(95,211,255,.5)",
+    designation: "CODE CLUSTER",
     desc: "除錯、重構、架構設計的技能航線。",
-    tag: "CODE CLUSTER · 5 PLANETS →",
+    tag: "5 ENTRIES CATALOGUED",
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.1">
+        <path d="M9 6L3.5 12 9 18" />
+        <path d="M15 6l5.5 6-5.5 6" />
+      </svg>
+    ),
   },
   {
     galaxy: "market",
+    index: "03",
     name: "行銷星系",
-    color: "#ffdf9a",
-    border: "rgba(255,200,87,.32)",
-    dotBg: "radial-gradient(circle at 34% 30%,#ffe9b8,#ffc857 60%)",
-    glow: "rgba(255,200,87,.5)",
+    designation: "MARKET CONSTELLATION",
     desc: "品牌、社群、成長策略的行星群。",
-    tag: "MARKET CONSTELLATION · 4 →",
+    tag: "4 ENTRIES CATALOGUED",
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.1">
+        <path d="M4 19V10M11 19V5M18 19v-7" />
+        <path d="M3 19h18" />
+      </svg>
+    ),
   },
 ];
 
 export default function Home() {
+  const pageRef = useRef(null);
+  const titleRef = useRef(null);
+  const subtitleRef = useRef(null);
+  const copyRef = useRef(null);
+  const ctaGroupRef = useRef(null);
+  const horizonRef = useRef(null);
+
+  useGSAP(
+    () => {
+      const tl = gsap.timeline({ defaults: { ease: "power2.out" } });
+
+      tl.from(titleRef.current, { y: 22, opacity: 0, duration: 1.1, ease: "power3.out" })
+        .from(subtitleRef.current, { y: 14, opacity: 0, duration: 0.9 }, "-=0.7")
+        .from(copyRef.current, { y: 12, opacity: 0, duration: 0.9 }, "-=0.6")
+        .from(ctaGroupRef.current, { y: 10, opacity: 0, duration: 0.7 }, "-=0.55")
+        .from(
+          ".archive-entry",
+          { y: 24, opacity: 0, duration: 0.8, stagger: 0.12, ease: "power2.out" },
+          "-=0.35"
+        );
+
+      gsap.to(horizonRef.current, {
+        y: -8,
+        duration: 7,
+        ease: "sine.inOut",
+        repeat: -1,
+        yoyo: true,
+      });
+    },
+    { scope: pageRef }
+  );
+
   return (
-    <div style={{ position: "relative", width: "100%", minHeight: "100vh", overflow: "hidden", background: "#04050c", fontFamily: "'Noto Sans TC',sans-serif" }}>
-      <Starfield nebula="radial-gradient(1400px 1000px at 50% 128%,#1b2f6b 0%,#0a1130 44%,#04050c 100%)" dotOpacity={1} twinkleOpacity={0.6} />
+    <div
+      ref={pageRef}
+      style={{
+        position: "relative",
+        width: "100%",
+        minHeight: "100vh",
+        overflow: "hidden",
+        background: "#07080a",
+        fontFamily: "'Noto Sans TC',sans-serif",
+      }}
+    >
+      <div className="film-grain" />
+      <div className="scanlines" />
 
-      {/* planet horizon */}
-      <div style={{ position: "absolute", left: "50%", bottom: "-58vw", width: "112vw", height: "112vw", transform: "translateX(-50%)", borderRadius: "50%", background: "radial-gradient(circle at 50% 20%,#3a6fd8 0%,#1a2f7a 40%,#0a1230 70%)", boxShadow: "0 -30px 160px rgba(95,150,255,.4)" }} />
-      <div style={{ position: "absolute", left: "50%", bottom: 0, width: "112vw", height: "24vh", transform: "translateX(-50%)", background: "linear-gradient(180deg,rgba(159,220,255,.12),transparent)" }} />
-      {/* moonlet */}
-      <div style={{ position: "absolute", left: "50%", top: "22vh", width: 60, height: 60, transform: "translateX(-50%)", borderRadius: "50%", background: "radial-gradient(circle at 34% 30%,#dfe8ff,#8fa8e6 55%,#3a4a80 100%)", boxShadow: "0 0 40px rgba(159,190,255,.5)", animation: "floatY 9s ease-in-out infinite" }} />
+      <div style={{ position: "absolute", inset: 0, filter: "grayscale(0.85) brightness(.85) contrast(1.05)" }}>
+        <Starfield nebula="radial-gradient(1400px 1000px at 50% 130%,#111214 0%,#0a0b0c 48%,#050506 100%)" dotOpacity={0.7} twinkleOpacity={0.3} />
+      </div>
 
-      {/* top bar */}
-      <div style={{ position: "relative", height: 64, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 clamp(24px,4vw,64px)" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 12, fontFamily: "'Chakra Petch',sans-serif" }}>
-          <span style={{ width: 10, height: 10, borderRadius: "50%", background: "#5fd3ff", boxShadow: "0 0 10px #5fd3ff" }} />
-          <span style={{ color: "#dce6ff", fontWeight: 700, letterSpacing: ".24em", fontSize: 15 }}>STELLAR ARCHIVE</span>
+      {/* vignette */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          background:
+            "radial-gradient(ellipse at 50% 38%, transparent 32%, rgba(0,0,0,.35) 78%, rgba(0,0,0,.72) 100%), linear-gradient(180deg, rgba(0,0,0,.4), rgba(0,0,0,.15) 22%, rgba(0,0,0,.1) 60%, rgba(0,0,0,.82) 100%)",
+          pointerEvents: "none",
+        }}
+      />
+
+      {/* desaturated horizon silhouette */}
+      <div
+        ref={horizonRef}
+        style={{
+          position: "absolute",
+          left: "50%",
+          bottom: "-58vw",
+          width: "130vw",
+          height: "130vw",
+          transform: "translateX(-50%)",
+          borderRadius: "50%",
+          background: "radial-gradient(circle at 50% 14%, #131416 0%, #0c0d0e 42%, #050506 78%)",
+          boxShadow: "0 -1px 0 rgba(210,214,220,.06)",
+        }}
+      />
+      <div
+        style={{
+          position: "absolute",
+          left: "50%",
+          bottom: 0,
+          width: "130vw",
+          height: "22vh",
+          transform: "translateX(-50%)",
+          background: "linear-gradient(180deg, rgba(255,255,255,.015), rgba(4,5,6,.85))",
+        }}
+      />
+
+      <CornerBrackets color={line} size={26} offset={18} />
+
+      {/* topbar */}
+      <div
+        style={{
+          position: "relative",
+          zIndex: 5,
+          height: 64,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: "0 clamp(24px,4vw,64px)",
+          borderBottom: `1px solid ${line}`,
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <span className="crt-flicker" style={{ width: 7, height: 7, border: `1px solid ${steel}`, background: "transparent" }} />
+          <span style={{ color: ink, fontWeight: 600, letterSpacing: ".26em", fontSize: 14, fontFamily: "'Chakra Petch',sans-serif" }}>
+            STELLAR ARCHIVE
+          </span>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 30, fontFamily: "'Chakra Petch',sans-serif", fontSize: 14, color: "#8fa0c8", letterSpacing: ".06em" }}>
-          <Link to="/explore" style={navLinkStyle}>星圖</Link>
-          <Link to="/galaxy" style={navLinkStyle}>3D 銀河</Link>
-          <Link to="/voyage" style={navLinkStyle}>我的航線</Link>
-          <Link to="/admin" style={navLinkStyle}>控制台</Link>
-          <Link to="/login" style={{ border: "1px solid rgba(95,211,255,.45)", borderRadius: 5, padding: "8px 18px", color: "#5fd3ff" }}>登入艦橋</Link>
+        <div style={{ display: "flex", alignItems: "center", gap: 30 }}>
+          <Link to="/explore" className="mono-link" style={navLinkStyle}>星圖</Link>
+          <Link to="/galaxy" className="mono-link" style={navLinkStyle}>3D 銀河</Link>
+          <Link to="/voyage" className="mono-link" style={navLinkStyle}>我的航線</Link>
+          <Link
+            to="/login"
+            style={{
+              border: `1px solid ${lineStrong}`,
+              borderRadius: 2,
+              padding: "8px 20px",
+              color: ink,
+              fontFamily: "'Space Mono',monospace",
+              fontSize: 11.5,
+              letterSpacing: ".16em",
+              textTransform: "uppercase",
+            }}
+          >
+            登入艦橋
+          </Link>
         </div>
       </div>
 
       {/* hero */}
-      <div style={{ position: "relative", textAlign: "center", padding: "clamp(80px,12vh,150px) 40px 0", animation: "rise .9s ease both" }}>
-        <div style={{ fontFamily: "'Space Mono',monospace", fontSize: 13, color: "#5fd3ff", letterSpacing: ".42em", marginBottom: 22 }}>— 探索家日誌 · STARDATE 3407 —</div>
-        <h1 style={{ fontFamily: "'Chakra Petch',sans-serif", fontWeight: 700, color: "#eaf1ff", fontSize: "clamp(42px,6vw,80px)", lineHeight: 1.05, margin: 0, letterSpacing: ".01em", textShadow: "0 0 46px rgba(95,150,255,.4)" }}>
-          駕駛你的太空船<br />穿越技能的星系
+      <div style={{ position: "relative", zIndex: 5, textAlign: "center", padding: "clamp(90px,13vh,160px) 40px 0", maxWidth: 900, margin: "0 auto" }}>
+        <h1
+          ref={titleRef}
+          style={{
+            fontFamily: "'Bebas Neue',sans-serif",
+            fontWeight: 400,
+            color: ink,
+            fontSize: "clamp(56px,9vw,124px)",
+            lineHeight: 0.96,
+            margin: 0,
+            letterSpacing: ".045em",
+          }}
+        >
+          STELLAR ARCHIVE
         </h1>
-        <p style={{ color: "#aebbdd", fontSize: "clamp(15px,1.4vw,18px)", lineHeight: 1.8, maxWidth: 640, margin: "28px auto 0" }}>
-          每一個 skill 與 prompt 都是一顆等待登陸的行星。搜索星系、標記航點，建立屬於你的星圖。
+        <div
+          ref={subtitleRef}
+          style={{
+            ...monoLabel,
+            fontSize: "clamp(11px,1.2vw,13px)",
+            color: inkDim,
+            letterSpacing: ".38em",
+            marginTop: 14,
+          }}
+        >
+          A STATION FOR CREATIVE COMMAND
+        </div>
+
+        <p
+          ref={copyRef}
+          style={{
+            color: inkDim,
+            fontSize: "clamp(14px,1.15vw,16px)",
+            lineHeight: 2,
+            maxWidth: 620,
+            margin: "30px auto 0",
+            fontWeight: 300,
+          }}
+        >
+          在寂靜的航道深處，典藏每一次技能遠征的紀錄——為偏好氛圍勝於喧嘩的探索者，打造的低語介面。
         </p>
-        <div style={{ display: "flex", gap: 16, justifyContent: "center", marginTop: 40 }}>
-          <Link to="/login" style={{ background: "#5fd3ff", color: "#04050c", fontFamily: "'Chakra Petch',sans-serif", fontWeight: 600, fontSize: 15, padding: "15px 36px", borderRadius: 6, letterSpacing: ".08em", boxShadow: "0 0 34px rgba(95,211,255,.4)" }}>▶ 開始航行</Link>
-          <Link to="/explore" style={{ border: "1px solid rgba(95,211,255,.4)", color: "#dce6ff", fontFamily: "'Chakra Petch',sans-serif", fontSize: 15, padding: "15px 36px", borderRadius: 6, letterSpacing: ".08em" }}>瀏覽星圖</Link>
+
+        <div ref={ctaGroupRef} style={{ display: "flex", gap: 14, justifyContent: "center", marginTop: 40, flexWrap: "wrap" }}>
+          <Link
+            to="/login"
+            style={{
+              background: "rgba(255,255,255,.06)",
+              color: ink,
+              fontFamily: "'Space Mono',monospace",
+              fontSize: 12.5,
+              padding: "16px 36px",
+              borderRadius: 2,
+              letterSpacing: ".16em",
+              textTransform: "uppercase",
+              border: `1px solid ${lineStrong}`,
+            }}
+          >
+            進入艙門
+          </Link>
+          <Link
+            to="/explore"
+            style={{
+              border: `1px solid ${line}`,
+              color: inkDim,
+              fontFamily: "'Space Mono',monospace",
+              fontSize: 12.5,
+              padding: "16px 36px",
+              borderRadius: 2,
+              letterSpacing: ".16em",
+              textTransform: "uppercase",
+            }}
+          >
+            檢視星圖
+          </Link>
         </div>
       </div>
 
-      {/* mission cards */}
-      <div style={{ position: "relative", display: "flex", gap: 20, justifyContent: "center", flexWrap: "wrap", padding: "clamp(60px,9vh,110px) clamp(24px,5vw,80px) 70px" }}>
-        {missionCards.map((c) => (
-          <Link
-            key={c.galaxy}
-            to={`/explore?g=${c.galaxy}`}
-            style={{ flex: 1, minWidth: 300, maxWidth: 380, border: `1px solid ${c.border}`, borderRadius: 12, padding: 24, background: "rgba(10,16,38,.55)", backdropFilter: "blur(6px)", display: "block" }}
-          >
-            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-              <span style={{ width: 36, height: 36, borderRadius: "50%", background: c.dotBg, boxShadow: `0 0 22px ${c.glow}` }} />
-              <span style={{ fontFamily: "'Chakra Petch',sans-serif", color: c.color, fontSize: 17 }}>{c.name}</span>
-            </div>
-            <p style={{ color: "#8fa0c8", fontSize: 13.5, lineHeight: 1.75, margin: "15px 0 0" }}>{c.desc}</p>
-            <div style={{ fontFamily: "'Space Mono',monospace", fontSize: 11, color: "#6b7aa0", marginTop: 16 }}>{c.tag}</div>
-          </Link>
-        ))}
+      {/* archive manifest */}
+      <div style={{ position: "relative", zIndex: 5, maxWidth: 1240, margin: "0 auto", padding: "clamp(70px,10vh,120px) clamp(24px,5vw,80px) 90px" }}>
+        <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 34, borderBottom: `1px solid ${line}`, paddingBottom: 18 }}>
+          <span style={{ ...monoLabel, fontSize: 12, color: ink, letterSpacing: ".2em" }}>ARCHIVE MANIFEST</span>
+          <span style={{ ...monoLabel, fontSize: 10.5, color: inkFaint }}>03 SYSTEMS CATALOGUED</span>
+        </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 1, background: line }}>
+          {archive.map((c) => (
+            <Link
+              key={c.galaxy}
+              to={`/explore?g=${c.galaxy}`}
+              className="archive-entry"
+              style={{
+                display: "block",
+                background: "#08090a",
+                border: `1px solid transparent`,
+                padding: 32,
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <span style={{ fontFamily: "'Space Mono',monospace", fontSize: 13, color: inkFaint }}>{c.index}</span>
+                <span style={{ color: inkFaint }}>{c.icon}</span>
+              </div>
+              <div style={{ marginTop: 22 }}>
+                <div style={{ color: ink, fontSize: 18, fontWeight: 500 }}>{c.name}</div>
+                <div style={{ ...monoLabel, fontSize: 10, color: inkFaint, marginTop: 6 }}>{c.designation}</div>
+              </div>
+              <p style={{ color: inkDim, fontSize: 13.5, lineHeight: 1.85, margin: "16px 0 0", fontWeight: 300 }}>{c.desc}</p>
+              <div style={{ ...monoLabel, fontSize: 10.5, color: inkFaint, marginTop: 22, display: "flex", alignItems: "center", gap: 8 }}>
+                {c.tag} <span style={{ color: steel }}>→</span>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </div>
+
+      {/* footer status line */}
+      <div
+        style={{
+          position: "relative",
+          zIndex: 5,
+          borderTop: `1px solid ${line}`,
+          padding: "18px clamp(24px,5vw,80px)",
+          display: "flex",
+          justifyContent: "space-between",
+          flexWrap: "wrap",
+          gap: 8,
+        }}
+      >
+        <span style={{ ...monoLabel, fontSize: 9.5, color: inkFaint }}>SYSTEM STATUS: NOMINAL</span>
+        <span style={{ ...monoLabel, fontSize: 9.5, color: inkFaint }}>TRANSMISSION ENCRYPTED · CH.03</span>
       </div>
     </div>
   );

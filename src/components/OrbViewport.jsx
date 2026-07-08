@@ -3,11 +3,11 @@ export default function OrbViewport({
   top = "50%",
   ring1Size = 420,
   ring2Size = 500,
-  ring1Color = "rgba(95,211,255,.14)",
-  ring2Color = "rgba(169,139,255,.18)",
+  ring1Color = "rgba(235,236,239,.14)",
+  ring2Color = "rgba(235,236,239,.10)",
   planetSize = 280,
-  planetBg = "radial-gradient(circle at 34% 30%, #6fe3ff 0%, #2b6fd6 34%, #1a2f7a 62%, #0a1030 100%)",
-  glow = "rgba(95,150,255,.45)",
+  planetBg = "radial-gradient(circle at 34% 30%, #dfe2e6 0%, #6d7580 34%, #2a2d32 62%, #0a0b0d 100%)",
+  glow = "rgba(200,206,214,.16)",
 }) {
   return (
     <>

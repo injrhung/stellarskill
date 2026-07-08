@@ -6,6 +6,6 @@ const CORNER_STYLE = {
 };
 
 /** HUD-style corner brackets, decorating viewport panels. */
-export default function CornerBrackets({ corners = ["tl", "tr", "bl", "br"], color = "rgba(95,211,255,.4)", size = 34, offset = 26 }) {
+export default function CornerBrackets({ corners = ["tl", "tr", "bl", "br"], color = "rgba(235,236,239,.22)", size = 34, offset = 26 }) {
   return corners.map((c) => <div key={c} style={CORNER_STYLE[c](size, color, offset)} />);
 }

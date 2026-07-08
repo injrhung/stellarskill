@@ -4,6 +4,13 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { GALAXIES, PLANETS } from "../data.js";
 
+const ink = "#e7e8ea";
+const inkDim = "#8f929a";
+const inkFaint = "#54575e";
+const line = "rgba(235,236,239,.10)";
+const lineStrong = "rgba(235,236,239,.22)";
+const steel = "#9cadbd";
+
 const PLANET_COUNTS = PLANETS.reduce((acc, p) => {
   acc[p.galaxy] = (acc[p.galaxy] || 0) + 1;
   return acc;
@@ -51,10 +58,10 @@ export default function Galaxy3D() {
 
     const sprite = discTexture();
 
-    // spiral galaxy point cloud
+    // spiral galaxy point cloud — desaturated white → steel → charcoal
     const COUNT = 14000, arms = 4, R = 260;
     const pos = new Float32Array(COUNT * 3), col = new Float32Array(COUNT * 3);
-    const cInner = new THREE.Color("#fff3d8"), cMid = new THREE.Color("#7aa8ff"), cOut = new THREE.Color("#a98bff");
+    const cInner = new THREE.Color("#f2f3f5"), cMid = new THREE.Color("#9aa3ad"), cOut = new THREE.Color("#4b4f56");
     for (let i = 0; i < COUNT; i++) {
       const t = Math.pow(Math.random(), 0.6);
       const rad = t * R;
@@ -72,7 +79,7 @@ export default function Galaxy3D() {
     const geo = new THREE.BufferGeometry();
     geo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
     geo.setAttribute("color", new THREE.BufferAttribute(col, 3));
-    const mat = new THREE.PointsMaterial({ size: 2.4, map: sprite, vertexColors: true, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, sizeAttenuation: true, opacity: 0.95 });
+    const mat = new THREE.PointsMaterial({ size: 2.4, map: sprite, vertexColors: true, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, sizeAttenuation: true, opacity: 0.8 });
     const cloud = new THREE.Points(geo, mat);
     scene.add(cloud);
 
@@ -88,7 +95,7 @@ export default function Galaxy3D() {
       cp[i * 3 + 2] = r * Math.sin(b) * Math.sin(a);
     }
     coreGeo.setAttribute("position", new THREE.BufferAttribute(cp, 3));
-    scene.add(new THREE.Points(coreGeo, new THREE.PointsMaterial({ size: 4, map: sprite, color: 0xffe9c0, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0.9 })));
+    scene.add(new THREE.Points(coreGeo, new THREE.PointsMaterial({ size: 4, map: sprite, color: 0xeceeef, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0.75 })));
 
     // distant starfield
     const sfN = 2500, sfp = new Float32Array(sfN * 3);
@@ -102,7 +109,7 @@ export default function Galaxy3D() {
     }
     const sfGeo = new THREE.BufferGeometry();
     sfGeo.setAttribute("position", new THREE.BufferAttribute(sfp, 3));
-    scene.add(new THREE.Points(sfGeo, new THREE.PointsMaterial({ size: 1.6, map: sprite, color: 0xbcd0ff, transparent: true, depthWrite: false, opacity: 0.6 })));
+    scene.add(new THREE.Points(sfGeo, new THREE.PointsMaterial({ size: 1.6, map: sprite, color: 0xc7c9cd, transparent: true, depthWrite: false, opacity: 0.55 })));
 
     // galaxy category markers
     const markers = [];
@@ -111,22 +118,22 @@ export default function Galaxy3D() {
       const g = GALAXIES.find((x) => x.id === l.id);
       const x = Math.cos(l.ang) * l.r, z = Math.sin(l.ang) * l.r, y = 8;
 
-      const smat = new THREE.SpriteMaterial({ map: sprite, color: g.color, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, opacity: 0.95 });
+      const smat = new THREE.SpriteMaterial({ map: sprite, color: g.color, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, opacity: 0.85 });
       const sp = new THREE.Sprite(smat);
       sp.position.set(x, y, z); sp.scale.set(46, 46, 1); scene.add(sp);
 
-      const smat2 = new THREE.SpriteMaterial({ map: sprite, color: 0xffffff, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, opacity: 0.9 });
+      const smat2 = new THREE.SpriteMaterial({ map: sprite, color: 0xffffff, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, opacity: 0.85 });
       const sp2 = new THREE.Sprite(smat2);
       sp2.position.set(x, y, z); sp2.scale.set(16, 16, 1); scene.add(sp2);
 
-      const ring = new THREE.Mesh(new THREE.RingGeometry(30, 31.5, 64), new THREE.MeshBasicMaterial({ color: g.color, side: THREE.DoubleSide, transparent: true, opacity: 0.5 }));
+      const ring = new THREE.Mesh(new THREE.RingGeometry(30, 31.5, 64), new THREE.MeshBasicMaterial({ color: 0xd6dee4, side: THREE.DoubleSide, transparent: true, opacity: 0.35 }));
       ring.rotation.x = Math.PI / 2; ring.position.set(x, y, z); scene.add(ring);
 
       const el = document.createElement("div");
       el.className = "glx-label";
       el.innerHTML =
-        `<div style="font-family:'Chakra Petch',sans-serif;color:#fff;font-size:15px;letter-spacing:.06em;text-shadow:0 0 12px ${g.color};">${g.name}</div>` +
-        `<div style="font-family:'Space Mono',monospace;font-size:10px;color:${g.color};letter-spacing:.12em;">${g.en} · ${PLANET_COUNTS[g.id] || 0}</div>`;
+        `<div style="font-family:'Chakra Petch',sans-serif;color:#e7e8ea;font-size:15px;letter-spacing:.06em;">${g.name}</div>` +
+        `<div style="font-family:'Space Mono',monospace;font-size:10px;color:#9cadbd;letter-spacing:.12em;">${g.en} · ${PLANET_COUNTS[g.id] || 0}</div>`;
       labelBox.appendChild(el);
       markers.push({ pos: new THREE.Vector3(x, y, z), el });
     });
@@ -167,46 +174,46 @@ export default function Galaxy3D() {
   }, []);
 
   return (
-    <div style={{ position: "relative", width: "100%", height: "100vh", background: "radial-gradient(1200px 900px at 50% 50%,#0a1028 0%,#04050f 60%,#02030a 100%)", fontFamily: "'Noto Sans TC',sans-serif", overflow: "hidden" }}>
+    <div style={{ position: "relative", width: "100%", height: "100vh", background: "radial-gradient(1200px 900px at 50% 50%,#0d0e10 0%,#07080a 60%,#050506 100%)", fontFamily: "'Noto Sans TC',sans-serif", overflow: "hidden" }}>
       <div ref={stageRef} style={{ position: "absolute", inset: 0 }} />
       <div ref={labelsRef} style={{ position: "absolute", inset: 0, pointerEvents: "none" }} />
 
       {/* corner brackets */}
-      <div style={{ position: "absolute", top: 74, left: 24, width: 34, height: 34, borderLeft: "2px solid rgba(95,211,255,.4)", borderTop: "2px solid rgba(95,211,255,.4)", pointerEvents: "none" }} />
-      <div style={{ position: "absolute", top: 74, right: 24, width: 34, height: 34, borderRight: "2px solid rgba(95,211,255,.4)", borderTop: "2px solid rgba(95,211,255,.4)", pointerEvents: "none" }} />
-      <div style={{ position: "absolute", bottom: 24, left: 24, width: 34, height: 34, borderLeft: "2px solid rgba(95,211,255,.4)", borderBottom: "2px solid rgba(95,211,255,.4)", pointerEvents: "none" }} />
-      <div style={{ position: "absolute", bottom: 24, right: 24, width: 34, height: 34, borderRight: "2px solid rgba(95,211,255,.4)", borderBottom: "2px solid rgba(95,211,255,.4)", pointerEvents: "none" }} />
+      <div style={{ position: "absolute", top: 74, left: 24, width: 34, height: 34, borderLeft: `2px solid ${lineStrong}`, borderTop: `2px solid ${lineStrong}`, pointerEvents: "none" }} />
+      <div style={{ position: "absolute", top: 74, right: 24, width: 34, height: 34, borderRight: `2px solid ${lineStrong}`, borderTop: `2px solid ${lineStrong}`, pointerEvents: "none" }} />
+      <div style={{ position: "absolute", bottom: 24, left: 24, width: 34, height: 34, borderLeft: `2px solid ${lineStrong}`, borderBottom: `2px solid ${lineStrong}`, pointerEvents: "none" }} />
+      <div style={{ position: "absolute", bottom: 24, right: 24, width: 34, height: 34, borderRight: `2px solid ${lineStrong}`, borderBottom: `2px solid ${lineStrong}`, pointerEvents: "none" }} />
 
       {/* top bar */}
-      <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 56, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 24px", borderBottom: "1px solid rgba(95,211,255,.14)", background: "rgba(4,6,16,.5)", backdropFilter: "blur(6px)" }}>
+      <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 56, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 24px", borderBottom: `1px solid ${line}`, background: "rgba(7,8,10,.6)", backdropFilter: "blur(6px)" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-          <Link to="/" style={{ fontFamily: "'Chakra Petch',sans-serif", color: "#8fa0c8", fontSize: 12, letterSpacing: ".14em" }}>◂ 星域</Link>
-          <span style={{ width: 1, height: 18, background: "rgba(95,211,255,.2)" }} />
-          <span style={{ fontFamily: "'Chakra Petch',sans-serif", color: "#dce6ff", fontWeight: 600, letterSpacing: ".14em", fontSize: 14 }}>HOLO-GALAXY · 全息銀河系</span>
+          <Link to="/" style={{ fontFamily: "'Chakra Petch',sans-serif", color: inkDim, fontSize: 12, letterSpacing: ".14em" }}>◂ 星域</Link>
+          <span style={{ width: 1, height: 18, background: line }} />
+          <span style={{ fontFamily: "'Chakra Petch',sans-serif", color: ink, fontWeight: 600, letterSpacing: ".14em", fontSize: 14 }}>HOLO-GALAXY · 全息銀河系</span>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 20, fontFamily: "'Space Mono',monospace", fontSize: 12, color: "#8fa0c8" }}>
-          <Link to="/explore" style={{ color: "#5fd3ff" }}>▦ 星圖圖譜</Link>
+        <div style={{ display: "flex", alignItems: "center", gap: 20, fontFamily: "'Space Mono',monospace", fontSize: 12, color: inkDim }}>
+          <Link to="/explore" style={{ color: steel }}>▦ 星圖圖譜</Link>
           <span>3 GALAXIES · 14 PLANETS</span>
         </div>
       </div>
 
       {/* title */}
       <div style={{ position: "absolute", top: 84, left: 32, pointerEvents: "none" }}>
-        <div style={{ fontFamily: "'Space Mono',monospace", fontSize: 12, color: "#5fd3ff", letterSpacing: ".32em" }}>STELLAR ARCHIVE // MILKY WAY VIEW</div>
-        <h1 style={{ fontFamily: "'Chakra Petch',sans-serif", color: "#eaf1ff", fontSize: 30, margin: "8px 0 0", fontWeight: 600, textShadow: "0 0 30px rgba(95,150,255,.4)" }}>全銀河總覽</h1>
+        <div style={{ fontFamily: "'Space Mono',monospace", fontSize: 12, color: steel, letterSpacing: ".32em", textTransform: "uppercase" }}>STELLAR ARCHIVE // MILKY WAY VIEW</div>
+        <h1 style={{ fontFamily: "'Chakra Petch',sans-serif", color: ink, fontSize: 30, margin: "8px 0 0", fontWeight: 600 }}>全銀河總覽</h1>
       </div>
 
       {/* instructions */}
-      <div style={{ position: "absolute", bottom: 34, left: 32, fontFamily: "'Space Mono',monospace", fontSize: 12, color: "#8fa0c8", lineHeight: 1.9, pointerEvents: "none" }}>
-        <div><span style={{ color: "#5fd3ff" }}>拖曳</span> 旋轉銀河　<span style={{ color: "#5fd3ff" }}>滾輪</span> 縮放　<span style={{ color: "#5fd3ff" }}>右鍵拖曳</span> 平移</div>
-        <div style={{ color: "#5a6788" }}>AUTO-ROTATE ENABLED · DRAG TO OVERRIDE</div>
+      <div style={{ position: "absolute", bottom: 34, left: 32, fontFamily: "'Space Mono',monospace", fontSize: 12, color: inkDim, lineHeight: 1.9, pointerEvents: "none" }}>
+        <div><span style={{ color: steel }}>拖曳</span> 旋轉銀河　<span style={{ color: steel }}>滾輪</span> 縮放　<span style={{ color: steel }}>右鍵拖曳</span> 平移</div>
+        <div style={{ color: inkFaint }}>AUTO-ROTATE ENABLED · DRAG TO OVERRIDE</div>
       </div>
 
       {/* legend */}
       <div style={{ position: "absolute", bottom: 34, right: 36, display: "flex", flexDirection: "column", gap: 10, fontFamily: "'Chakra Petch',sans-serif", fontSize: 13, pointerEvents: "none" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10, color: "#c9b8ff", justifyContent: "flex-end" }}>寫作星系 <span style={{ width: 12, height: 12, borderRadius: "50%", background: "#a98bff", boxShadow: "0 0 10px #a98bff" }} /></div>
-        <div style={{ display: "flex", alignItems: "center", gap: 10, color: "#9fe0ff", justifyContent: "flex-end" }}>程式星系 <span style={{ width: 12, height: 12, borderRadius: "50%", background: "#5fd3ff", boxShadow: "0 0 10px #5fd3ff" }} /></div>
-        <div style={{ display: "flex", alignItems: "center", gap: 10, color: "#ffdf9a", justifyContent: "flex-end" }}>行銷星系 <span style={{ width: 12, height: 12, borderRadius: "50%", background: "#ffc857", boxShadow: "0 0 10px #ffc857" }} /></div>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, color: inkDim, justifyContent: "flex-end" }}>寫作星系 <span style={{ width: 10, height: 10, border: `1px solid ${lineStrong}` }} /></div>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, color: inkDim, justifyContent: "flex-end" }}>程式星系 <span style={{ width: 10, height: 10, border: `1px solid ${lineStrong}` }} /></div>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, color: inkDim, justifyContent: "flex-end" }}>行銷星系 <span style={{ width: 10, height: 10, border: `1px solid ${lineStrong}` }} /></div>
       </div>
     </div>
   );

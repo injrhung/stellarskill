@@ -4,13 +4,20 @@ import { GALAXIES, PLANETS, diffStars } from "../data.js";
 import PageTopBar, { ExplorerBadge } from "../components/PageTopBar.jsx";
 import { useIdentity } from "../hooks/useIdentity.js";
 
+const ink = "#e7e8ea";
+const inkDim = "#8f929a";
+const inkFaint = "#54575e";
+const line = "rgba(235,236,239,.10)";
+const lineStrong = "rgba(235,236,239,.24)";
+const steel = "#9cadbd";
+
 const PLANET_COUNTS = PLANETS.reduce((acc, p) => {
   acc[p.galaxy] = (acc[p.galaxy] || 0) + 1;
   return acc;
 }, {});
 
-const rowBase = { display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "9px 11px", borderRadius: 7, cursor: "pointer", transition: "all .15s", fontFamily: "'Noto Sans TC',sans-serif", border: "none", textAlign: "left" };
-const typeBase = { flex: 1, height: 34, borderRadius: 7, cursor: "pointer", fontFamily: "'Space Mono',monospace", fontSize: 12, letterSpacing: ".06em", transition: "all .15s" };
+const rowBase = { display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "9px 11px", borderRadius: 2, cursor: "pointer", transition: "all .15s", fontFamily: "'Noto Sans TC',sans-serif", border: "none", textAlign: "left" };
+const typeBase = { flex: 1, height: 34, borderRadius: 2, cursor: "pointer", fontFamily: "'Space Mono',monospace", fontSize: 12, letterSpacing: ".06em", textTransform: "uppercase", transition: "all .15s" };
 
 export default function Explore() {
   const [searchParams] = useSearchParams();
@@ -64,7 +71,7 @@ export default function Explore() {
         r: 8 + Math.min(6, p.uses / 300), mass: 1.4,
       });
     });
-    const edges = PLANETS.map((p) => ({ a: p.galaxy, b: p.id, color: GALAXIES.find((g) => g.id === p.galaxy).color }));
+    const edges = PLANETS.map((p) => ({ a: p.galaxy, b: p.id }));
     const nodeById = {};
     nodes.forEach((n) => (nodeById[n.id] = n));
 
@@ -167,9 +174,9 @@ export default function Explore() {
         if (!active(a) || !active(b)) continue;
         const pa = toScreen(a.x, a.y), pb = toScreen(b.x, b.y);
         const lit = hov && neigh.has(a.id) && neigh.has(b.id) && (a.id === hov.id || b.id === hov.id);
-        c.strokeStyle = lit ? e.color : "rgba(120,150,210,0.16)";
-        c.lineWidth = lit ? 1.4 : 0.8;
-        c.globalAlpha = hov && !lit ? 0.4 : 1;
+        c.strokeStyle = lit ? "rgba(210,214,220,.55)" : "rgba(210,214,220,0.12)";
+        c.lineWidth = lit ? 1.2 : 0.8;
+        c.globalAlpha = hov && !lit ? 0.35 : 1;
         c.beginPath(); c.moveTo(pa.x, pa.y); c.lineTo(pb.x, pb.y); c.stroke(); c.globalAlpha = 1;
       }
       for (const n of nodes) {
@@ -177,22 +184,21 @@ export default function Explore() {
         const p = toScreen(n.x, n.y);
         const r = n.r * cam.scale;
         const dim = hov && !neigh.has(n.id);
-        c.globalAlpha = dim ? 0.35 : 1;
-        c.shadowColor = n.color;
-        c.shadowBlur = hov && neigh.has(n.id) ? 22 : 12;
+        const lit = hov && neigh.has(n.id);
+        c.globalAlpha = dim ? 0.32 : 1;
         c.beginPath(); c.arc(p.x, p.y, r, 0, Math.PI * 2);
         if (n.kind === "galaxy") {
           const g = c.createRadialGradient(p.x - r * 0.3, p.y - r * 0.3, r * 0.2, p.x, p.y, r);
-          g.addColorStop(0, "#fff"); g.addColorStop(0.4, n.color); g.addColorStop(1, n.color + "55");
+          g.addColorStop(0, "#f2f3f5"); g.addColorStop(0.45, "#9199a3"); g.addColorStop(1, "#43474e");
           c.fillStyle = g;
         } else {
-          c.fillStyle = n.color;
+          c.fillStyle = lit ? "#c7cbd1" : "#6d7580";
         }
-        c.fill(); c.shadowBlur = 0;
-        if (n.kind === "galaxy") { c.strokeStyle = "rgba(255,255,255,.5)"; c.lineWidth = 1; c.stroke(); }
+        c.fill();
+        if (n.kind === "galaxy") { c.strokeStyle = "rgba(235,236,239,.45)"; c.lineWidth = 1; c.stroke(); }
         if (cam.scale > 0.6 || n.kind === "galaxy") {
-          c.globalAlpha = dim ? 0.3 : 1;
-          c.fillStyle = n.kind === "galaxy" ? "#eaf1ff" : "#aebbdd";
+          c.globalAlpha = dim ? 0.28 : 1;
+          c.fillStyle = n.kind === "galaxy" ? ink : inkDim;
           c.font = n.kind === "galaxy" ? "600 13px 'Chakra Petch'" : "12px 'Noto Sans TC'";
           c.textAlign = "center";
           c.fillText(n.name, p.x, p.y + r + 15);
@@ -254,12 +260,12 @@ export default function Explore() {
   const galaxyRows = GALAXIES.map((g) => {
     const on = !off[g.id];
     return {
-      id: g.id, name: g.name, count: PLANET_COUNTS[g.id] || 0, dot: on ? g.color : "#3a4360",
+      id: g.id, name: g.name, count: PLANET_COUNTS[g.id] || 0,
       style: {
         ...rowBase,
         ...(on
-          ? { border: `1px solid ${g.color}55`, background: `${g.color}14`, color: "#dce6ff" }
-          : { border: "1px solid rgba(95,211,255,.12)", background: "transparent", color: "#5a6788" }),
+          ? { border: `1px solid ${lineStrong}`, background: "rgba(255,255,255,.04)", color: ink }
+          : { border: `1px solid ${line}`, background: "transparent", color: inkFaint }),
       },
     };
   });
@@ -271,21 +277,18 @@ export default function Explore() {
       return next;
     });
   }
-  function typeStyle(active, color) {
-    return { ...typeBase, ...(active ? { border: `1px solid ${color}`, background: `${color}18`, color } : { border: "1px solid rgba(95,211,255,.14)", background: "transparent", color: "#5a6788" }) };
+  function typeStyle(active) {
+    return { ...typeBase, ...(active ? { border: `1px solid ${lineStrong}`, background: "rgba(255,255,255,.06)", color: ink } : { border: `1px solid ${line}`, background: "transparent", color: inkFaint }) };
   }
 
-  const selGalaxy = sel ? GALAXIES.find((g) => g.id === sel.galaxy) : null;
-  const selColor = selGalaxy ? selGalaxy.color : "#5fd3ff";
-
   return (
-    <div style={{ display: "flex", flexDirection: "column", width: "100%", height: "100vh", background: "#05070f", fontFamily: "'Noto Sans TC',sans-serif" }}>
+    <div style={{ display: "flex", flexDirection: "column", width: "100%", height: "100vh", background: "#07080a", fontFamily: "'Noto Sans TC',sans-serif" }}>
       <PageTopBar
         title="STAR CHART · 星圖圖譜"
         right={(
           <>
-            <Link to="/galaxy" style={{ color: "#5fd3ff" }}>◉ 3D 銀河</Link>
-            <Link to="/voyage" style={{ color: "#8fa0c8" }}>我的航線</Link>
+            <Link to="/galaxy" style={{ color: steel }}>◉ 3D 銀河</Link>
+            <Link to="/voyage" style={{ color: inkDim }}>我的航線</Link>
             <ExplorerBadge name={identity.name} />
           </>
         )}
@@ -293,73 +296,73 @@ export default function Explore() {
 
       <div style={{ flex: 1, minHeight: 0, display: "grid", gridTemplateColumns: "288px 1fr 300px" }}>
         {/* LEFT filter panel */}
-        <div style={{ borderRight: "1px solid rgba(95,211,255,.12)", padding: "22px 20px", overflowY: "auto", background: "rgba(7,11,26,.5)" }}>
-          <div style={{ fontFamily: "'Space Mono',monospace", fontSize: 11, color: "#5fd3ff", letterSpacing: ".2em", marginBottom: 14 }}>FILTERS // 篩選</div>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, height: 40, border: "1px solid rgba(95,211,255,.24)", borderRadius: 7, padding: "0 12px", marginBottom: 22 }}>
-            <span style={{ color: "#5fd3ff" }}>⌕</span>
-            <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="搜尋行星…" style={{ flex: 1, background: "transparent", border: "none", outline: "none", color: "#dce6ff", fontSize: 13 }} />
+        <div style={{ borderRight: `1px solid ${line}`, padding: "22px 20px", overflowY: "auto", background: "rgba(255,255,255,.015)" }}>
+          <div style={{ fontFamily: "'Space Mono',monospace", fontSize: 11, color: steel, letterSpacing: ".2em", marginBottom: 14, textTransform: "uppercase" }}>FILTERS // 篩選</div>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, height: 40, border: `1px solid ${lineStrong}`, borderRadius: 2, padding: "0 12px", marginBottom: 22 }}>
+            <span style={{ color: inkDim }}>⌕</span>
+            <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="搜尋行星…" style={{ flex: 1, background: "transparent", border: "none", outline: "none", color: ink, fontSize: 13 }} />
           </div>
 
-          <div style={{ fontFamily: "'Space Mono',monospace", fontSize: 11, color: "#6b7aa0", letterSpacing: ".16em", marginBottom: 10 }}>星系 GALAXIES</div>
+          <div style={{ fontFamily: "'Space Mono',monospace", fontSize: 11, color: inkFaint, letterSpacing: ".14em", marginBottom: 10, textTransform: "uppercase" }}>星系 GALAXIES</div>
           <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 24 }}>
             {galaxyRows.map((g) => (
               <button key={g.id} onClick={() => toggleGalaxy(g.id)} style={g.style}>
-                <span style={{ width: 12, height: 12, borderRadius: "50%", background: g.dot, boxShadow: `0 0 8px ${g.dot}`, flex: "none" }} />
+                <span style={{ width: 10, height: 10, border: `1px solid ${lineStrong}`, flex: "none" }} />
                 <span style={{ flex: 1, textAlign: "left", fontSize: 13 }}>{g.name}</span>
-                <span style={{ fontFamily: "'Space Mono',monospace", fontSize: 11, color: "#6b7aa0" }}>{g.count}</span>
+                <span style={{ fontFamily: "'Space Mono',monospace", fontSize: 11, color: inkFaint }}>{g.count}</span>
               </button>
             ))}
           </div>
 
-          <div style={{ fontFamily: "'Space Mono',monospace", fontSize: 11, color: "#6b7aa0", letterSpacing: ".16em", marginBottom: 10 }}>類型 TYPE</div>
+          <div style={{ fontFamily: "'Space Mono',monospace", fontSize: 11, color: inkFaint, letterSpacing: ".14em", marginBottom: 10, textTransform: "uppercase" }}>類型 TYPE</div>
           <div style={{ display: "flex", gap: 8, marginBottom: 24 }}>
-            <button onClick={() => setTypes((t) => ({ ...t, skill: !t.skill }))} style={typeStyle(types.skill, "#5fd3ff")}>skill</button>
-            <button onClick={() => setTypes((t) => ({ ...t, prompt: !t.prompt }))} style={typeStyle(types.prompt, "#a98bff")}>prompt</button>
+            <button onClick={() => setTypes((t) => ({ ...t, skill: !t.skill }))} style={typeStyle(types.skill)}>skill</button>
+            <button onClick={() => setTypes((t) => ({ ...t, prompt: !t.prompt }))} style={typeStyle(types.prompt)}>prompt</button>
           </div>
 
-          <div style={{ borderTop: "1px solid rgba(95,211,255,.12)", paddingTop: 18 }}>
-            <div style={{ fontFamily: "'Space Mono',monospace", fontSize: 11, color: "#6b7aa0", letterSpacing: ".16em", marginBottom: 10 }}>檢視 VIEW</div>
-            <button onClick={() => resetViewRef.current()} style={{ width: "100%", height: 38, border: "1px solid rgba(95,211,255,.24)", background: "transparent", borderRadius: 7, color: "#8fa0c8", fontFamily: "'Chakra Petch',sans-serif", fontSize: 12, letterSpacing: ".1em", cursor: "pointer" }}>⟳ 重置視角</button>
-            <p style={{ color: "#5a6788", fontSize: 11, lineHeight: 1.7, margin: "14px 0 0" }}>拖曳節點重新排列 · 滾輪縮放 · 拖曳空白處平移 · 點擊行星查看詳情</p>
+          <div style={{ borderTop: `1px solid ${line}`, paddingTop: 18 }}>
+            <div style={{ fontFamily: "'Space Mono',monospace", fontSize: 11, color: inkFaint, letterSpacing: ".14em", marginBottom: 10, textTransform: "uppercase" }}>檢視 VIEW</div>
+            <button onClick={() => resetViewRef.current()} style={{ width: "100%", height: 38, border: `1px solid ${lineStrong}`, background: "transparent", borderRadius: 2, color: inkDim, fontFamily: "'Space Mono',monospace", fontSize: 11.5, letterSpacing: ".08em", textTransform: "uppercase", cursor: "pointer" }}>⟳ 重置視角</button>
+            <p style={{ color: inkFaint, fontSize: 11, lineHeight: 1.7, margin: "14px 0 0" }}>拖曳節點重新排列 · 滾輪縮放 · 拖曳空白處平移 · 點擊行星查看詳情</p>
           </div>
         </div>
 
         {/* CENTER graph */}
-        <div ref={wrapRef} style={{ position: "relative", overflow: "hidden", background: "radial-gradient(900px 700px at 50% 45%,#0b1330 0%,#070a1c 60%,#05070f 100%)" }}>
+        <div ref={wrapRef} style={{ position: "relative", overflow: "hidden", background: "radial-gradient(900px 700px at 50% 45%,#101113 0%,#0a0b0c 60%,#07080a 100%)" }}>
           <canvas ref={canvasRef} style={{ display: "block", cursor: "grab" }} />
-          <div style={{ position: "absolute", top: 16, left: 16, fontFamily: "'Space Mono',monospace", fontSize: 11, color: "#5a6788", pointerEvents: "none" }}>NODES: {visibleCount} · GRAPH VIEW</div>
-          <div style={{ position: "absolute", bottom: 16, left: 16, display: "flex", gap: 16, fontFamily: "'Space Mono',monospace", fontSize: 11, color: "#8fa0c8", pointerEvents: "none" }}>
-            <span><span style={{ color: "#a98bff" }}>●</span> 寫作</span>
-            <span><span style={{ color: "#5fd3ff" }}>●</span> 程式</span>
-            <span><span style={{ color: "#ffc857" }}>●</span> 行銷</span>
+          <div style={{ position: "absolute", top: 16, left: 16, fontFamily: "'Space Mono',monospace", fontSize: 11, color: inkFaint, pointerEvents: "none" }}>NODES: {visibleCount} · GRAPH VIEW</div>
+          <div style={{ position: "absolute", bottom: 16, left: 16, display: "flex", gap: 16, fontFamily: "'Space Mono',monospace", fontSize: 11, color: inkDim, pointerEvents: "none" }}>
+            <span><span style={{ color: inkFaint }}>●</span> 寫作</span>
+            <span><span style={{ color: inkFaint }}>●</span> 程式</span>
+            <span><span style={{ color: inkFaint }}>●</span> 行銷</span>
           </div>
         </div>
 
         {/* RIGHT detail */}
-        <div style={{ borderLeft: "1px solid rgba(95,211,255,.12)", padding: "22px 20px", overflowY: "auto", background: "rgba(7,11,26,.5)" }}>
+        <div style={{ borderLeft: `1px solid ${line}`, padding: "22px 20px", overflowY: "auto", background: "rgba(255,255,255,.015)" }}>
           {sel ? (
             <div>
-              <div style={{ fontFamily: "'Space Mono',monospace", fontSize: 11, color: "#6b7aa0", letterSpacing: ".16em", marginBottom: 14 }}>{sel.coord} · {sel.type.toUpperCase()}</div>
-              <div style={{ width: 66, height: 66, borderRadius: "50%", background: `radial-gradient(circle at 34% 30%, #fff, ${selColor} 55%, ${selColor}44 100%)`, boxShadow: `0 0 34px ${selColor}88`, marginBottom: 16 }} />
-              <h2 style={{ fontFamily: "'Chakra Petch',sans-serif", color: "#eaf1ff", fontSize: 20, margin: "0 0 2px" }}>{sel.name}</h2>
-              <div style={{ fontFamily: "'Space Mono',monospace", fontSize: 11, color: selColor, letterSpacing: ".08em", marginBottom: 16 }}>{sel.en}</div>
-              <p style={{ color: "#aebbdd", fontSize: 13.5, lineHeight: 1.8, margin: "0 0 18px" }}>{sel.summary}</p>
-              <div style={{ display: "flex", gap: 10, marginBottom: 8 }}>
-                <div style={{ flex: 1, border: "1px solid rgba(95,211,255,.18)", borderRadius: 7, padding: 10 }}>
-                  <div style={{ fontFamily: "'Space Mono',monospace", fontSize: 10, color: "#6b7aa0" }}>難度</div>
-                  <div style={{ color: "#dce6ff", fontFamily: "'Chakra Petch',sans-serif", fontSize: 15 }}>{diffStars(sel.difficulty)}</div>
+              <div style={{ fontFamily: "'Space Mono',monospace", fontSize: 11, color: inkFaint, letterSpacing: ".14em", marginBottom: 14, textTransform: "uppercase" }}>{sel.coord} · {sel.type.toUpperCase()}</div>
+              <div style={{ width: 60, height: 60, border: `1px solid ${lineStrong}`, background: "radial-gradient(circle at 34% 30%, #cfd2d7, #6d7580 60%)", marginBottom: 16 }} />
+              <h2 style={{ fontFamily: "'Chakra Petch',sans-serif", color: ink, fontSize: 20, margin: "0 0 2px" }}>{sel.name}</h2>
+              <div style={{ fontFamily: "'Space Mono',monospace", fontSize: 11, color: steel, letterSpacing: ".08em", marginBottom: 16 }}>{sel.en}</div>
+              <p style={{ color: inkDim, fontSize: 13.5, lineHeight: 1.8, margin: "0 0 18px" }}>{sel.summary}</p>
+              <div style={{ display: "flex", gap: 1, marginBottom: 8, background: line }}>
+                <div style={{ flex: 1, padding: 10, background: "#08090a" }}>
+                  <div style={{ fontFamily: "'Space Mono',monospace", fontSize: 10, color: inkFaint }}>難度</div>
+                  <div style={{ color: ink, fontFamily: "'Chakra Petch',sans-serif", fontSize: 15 }}>{diffStars(sel.difficulty)}</div>
                 </div>
-                <div style={{ flex: 1, border: "1px solid rgba(95,211,255,.18)", borderRadius: 7, padding: 10 }}>
-                  <div style={{ fontFamily: "'Space Mono',monospace", fontSize: 10, color: "#6b7aa0" }}>航行次數</div>
-                  <div style={{ color: "#dce6ff", fontFamily: "'Chakra Petch',sans-serif", fontSize: 15 }}>{sel.uses}</div>
+                <div style={{ flex: 1, padding: 10, background: "#08090a" }}>
+                  <div style={{ fontFamily: "'Space Mono',monospace", fontSize: 10, color: inkFaint }}>航行次數</div>
+                  <div style={{ color: ink, fontFamily: "'Chakra Petch',sans-serif", fontSize: 15 }}>{sel.uses}</div>
                 </div>
               </div>
-              <Link to={`/planet/${sel.id}`} style={{ display: "flex", alignItems: "center", justifyContent: "center", height: 46, marginTop: 16, background: "#5fd3ff", color: "#04050c", fontFamily: "'Chakra Petch',sans-serif", fontWeight: 600, fontSize: 14, borderRadius: 8, letterSpacing: ".08em", boxShadow: "0 0 24px rgba(95,211,255,.3)" }}>▶ 登陸此行星</Link>
+              <Link to={`/planet/${sel.id}`} style={{ display: "flex", alignItems: "center", justifyContent: "center", height: 46, marginTop: 16, background: "rgba(255,255,255,.06)", color: ink, fontFamily: "'Space Mono',monospace", fontWeight: 400, fontSize: 12.5, borderRadius: 2, letterSpacing: ".1em", textTransform: "uppercase", border: `1px solid ${lineStrong}` }}>▶ 登陸此行星</Link>
             </div>
           ) : (
-            <div style={{ height: "100%", display: "flex", flexDirection: "column", justifyContent: "center", textAlign: "center", color: "#5a6788", paddingTop: 60 }}>
+            <div style={{ height: "100%", display: "flex", flexDirection: "column", justifyContent: "center", textAlign: "center", color: inkFaint, paddingTop: 60 }}>
               <div style={{ fontSize: 40, marginBottom: 14, opacity: 0.5 }}>◎</div>
-              <div style={{ fontFamily: "'Chakra Petch',sans-serif", color: "#8fa0c8", fontSize: 14, letterSpacing: ".06em" }}>點選一顆行星</div>
+              <div style={{ fontFamily: "'Chakra Petch',sans-serif", color: inkDim, fontSize: 14, letterSpacing: ".06em" }}>點選一顆行星</div>
               <p style={{ fontSize: 12, lineHeight: 1.7, marginTop: 8 }}>選取圖譜上的節點<br />檢視該 skill / prompt 詳情</p>
             </div>
           )}

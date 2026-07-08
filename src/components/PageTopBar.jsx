@@ -5,10 +5,10 @@ export default function PageTopBar({
   backHref = "/",
   backLabel = "◂ 星域",
   title,
-  borderColor = "rgba(95,211,255,.14)",
-  background = "rgba(6,10,26,.6)",
-  titleColor = "#dce6ff",
-  dividerColor = "rgba(95,211,255,.2)",
+  borderColor = "rgba(235,236,239,.10)",
+  background = "rgba(7,8,10,.72)",
+  titleColor = "#e7e8ea",
+  dividerColor = "rgba(235,236,239,.16)",
   right,
   overlay = false,
 }) {
@@ -23,7 +23,7 @@ export default function PageTopBar({
       }}
     >
       <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-        <Link to={backHref} style={{ fontFamily: "'Chakra Petch',sans-serif", color: "#8fa0c8", fontSize: 12, letterSpacing: ".14em" }}>
+        <Link to={backHref} style={{ fontFamily: "'Chakra Petch',sans-serif", color: "#8f929a", fontSize: 12, letterSpacing: ".14em" }}>
           {backLabel}
         </Link>
         <span style={{ width: 1, height: 18, background: dividerColor }} />
@@ -31,7 +31,7 @@ export default function PageTopBar({
           {title}
         </span>
       </div>
-      <div style={{ display: "flex", alignItems: "center", gap: 20, fontFamily: "'Space Mono',monospace", fontSize: 12, color: "#8fa0c8" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 20, fontFamily: "'Space Mono',monospace", fontSize: 12, color: "#8f929a" }}>
         {right}
       </div>
     </div>
@@ -41,11 +41,11 @@ export default function PageTopBar({
 export function ExplorerBadge({ name }) {
   return (
     <>
-      <span style={{ color: "#5fd3ff" }}>探索家 · {name}</span>
+      <span style={{ color: "#9cadbd" }}>探索家 · {name}</span>
       <span
         style={{
-          width: 28, height: 28, borderRadius: "50%", border: "1px solid rgba(95,211,255,.4)",
-          display: "flex", alignItems: "center", justifyContent: "center", color: "#5fd3ff",
+          width: 28, height: 28, borderRadius: "2px", border: "1px solid rgba(235,236,239,.24)",
+          display: "flex", alignItems: "center", justifyContent: "center", color: "#9cadbd",
           fontFamily: "'Noto Sans TC',sans-serif",
         }}
       >

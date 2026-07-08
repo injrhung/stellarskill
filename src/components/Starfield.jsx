@@ -1,10 +1,10 @@
 const DOTS =
   "radial-gradient(1.5px 1.5px at 14% 20%,#fff,transparent)," +
-  "radial-gradient(1px 1px at 30% 60%,#bcd,transparent)," +
+  "radial-gradient(1px 1px at 30% 60%,#c7c9cd,transparent)," +
   "radial-gradient(1.5px 1.5px at 60% 16%,#fff,transparent)," +
-  "radial-gradient(1px 1px at 82% 44%,#9ad,transparent)," +
+  "radial-gradient(1px 1px at 82% 44%,#a7a9ad,transparent)," +
   "radial-gradient(1px 1px at 44% 78%,#fff,transparent)," +
-  "radial-gradient(1.5px 1.5px at 72% 86%,#cde,transparent)," +
+  "radial-gradient(1.5px 1.5px at 72% 86%,#cdced1,transparent)," +
   "radial-gradient(1px 1px at 92% 20%,#fff,transparent)," +
   "radial-gradient(1px 1px at 20% 88%,#fff,transparent)," +
   "radial-gradient(1.5px 1.5px at 90% 70%,#fff,transparent)";
